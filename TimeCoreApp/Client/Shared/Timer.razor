@@ -1,0 +1,89 @@
+﻿@using TimeCoreApp.Shared;
+@inject AppState AppState;
+@implements IDisposable
+@* Start button
+    Title
+     Elapsed
+*@
+
+<h1>Timer</h1>
+
+@if (Time != null)
+{
+
+    <table class="table font-light bgcolor-dark">
+        <thead>
+            @*<tr>
+                <th scope="col"></th>
+                <th scope="col">Title</th>
+                <th scope="col">Elapsed</th>
+                <th scope="col">Start</th>
+            </tr>*@
+        </thead>
+        <tbody>
+            <tr>
+
+                <td><input type="text" placeholder="(no description)" @bind=Time.Title class="input-dark"></td>
+                <td>@Time.Elapsed.ToString(@"h\:mm\:ss")</td>
+                <td>@(Time.StartTime > DateTime.MinValue ? Time.StartTime.ToString() : "-")</td>
+                <td><inpt type="button" @onclick=ToggleRunning class="btn btn-primary">@(Time.IsRunning ? $"Stop" : $"Start")</inpt></td>
+            </tr>
+        </tbody>
+    </table>
+
+
+}
+<hr />
+
+
+
+@code {
+    TimeEntry Time;
+
+    System.Timers.Timer timer;
+
+    protected override void OnInitialized()
+    {
+        if (AppState.CurrentTimeEntry == null)
+        {
+            AppState.CurrentTimeEntry = new TimeEntry();
+        }
+
+        Time = AppState.CurrentTimeEntry;
+
+        timer = new System.Timers.Timer(1000);
+        timer.Elapsed += OnTimedEvent;
+        timer.AutoReset = true;
+        if(Time.IsRunning) timer.Start();
+        //timer.Enabled = true;
+
+        AppState.OnChange += StateHasChanged;
+    }
+
+    public void ToggleRunning()
+    {
+        if (Time.IsRunning)
+        {
+            Time.Stop();
+            timer.Stop();
+            AppState.AddOrUpdateTime(Time);
+        }
+        else
+        {
+            Time.StartOrResume();
+            timer.Start();
+        }
+    }
+
+    private void OnTimedEvent(object sender, EventArgs e)
+    {
+        Console.WriteLine($"Updating clock... {Time.Elapsed}");
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        AppState.OnChange -= StateHasChanged;
+    }
+
+}

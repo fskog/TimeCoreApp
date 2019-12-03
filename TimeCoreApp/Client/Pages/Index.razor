@@ -1,0 +1,24 @@
+﻿@page "/"
+@inject AppState AppState;
+
+<Timer></Timer>
+<h3>The time tacking app.</h3>
+
+
+<TimeList></TimeList>
+<inpt type="button" @onclick=AddTestEntry class="btn btn-primary">Add test time</inpt>
+
+
+@code {
+    TimeCoreApp.Shared.TimeEntry TestTime;
+
+    public void AddTestEntry()
+    {
+        AppState.AddOrUpdateTime(new TimeCoreApp.Shared.TimeEntry()
+        {
+            Title = "Test time",
+            StartTime = DateTime.Now,
+            EndTime = DateTime.Now
+        });
+    }
+}

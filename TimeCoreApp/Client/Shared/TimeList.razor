@@ -1,0 +1,41 @@
+﻿@inject AppState AppState;
+@implements IDisposable
+
+<h4>History</h4>
+<div class="time-list">
+    <table class="table table-dark">
+        <thead>
+            <tr>
+                <th scope="col">Title</th>
+                <th scope="col">Elapsed</th>
+                <th scope="col">Start</th>
+                <th scope="col">End</th>
+                <th scope="col">Id</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (TimeCoreApp.Shared.TimeEntry Time in AppState.TimeEntries.OrderByDescending(t => t.StartTime))
+            {
+                <tr>
+                    <td>@Time.Title</td>
+                    <td>@Time.Elapsed</td>
+                    <td>@Time.StartTime</td>
+                    <td>@Time.EndTime</td>
+                    <td>@Time.SystemId</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        AppState.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        AppState.OnChange -= StateHasChanged;
+    }
+}
